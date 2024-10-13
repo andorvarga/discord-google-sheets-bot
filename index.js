@@ -5,4 +5,4 @@ client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
 });
 
-console.log(`Using token: ${process.env.Discord}`); // This should print even if there's a problem with the token
+console.log(`Using token: ${{shared.Discord}}`); // This should print even if there's a problem with the token
