@@ -3,10 +3,13 @@ const { google } = require('googleapis');
 const fs = require('fs');
 
 // Load Google Sheets API credentials
+const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'discord-bot-integration-438503-4a280d21b268.json', // Path to your downloaded service account JSON file
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  credentials: credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
 });
+
+const sheets = google.sheets({ version: 'v4', auth });
 
 // Spreadsheet ID and sheet name
 const spreadsheetId = '1hFHIMTyzj-js9A57qdRfpNwXq98cX6xVL-lI0HmMIUs';
