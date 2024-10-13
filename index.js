@@ -3,7 +3,14 @@ const { google } = require('googleapis');
 const fs = require('fs');
 
 // Load Google Sheets API credentials
-const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+let credentials;
+try {
+  credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+} catch (e) {
+  console.error('Failed to parse Google credentials:', e);
+  return; // Exit if credentials cannot be parsed
+}
+
 const auth = new google.auth.GoogleAuth({
   credentials: credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets']
