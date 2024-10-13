@@ -74,4 +74,4 @@ client.on('messageCreate', async (message) => {
 });
 
 // Log into Discord
-client.login('MTI5NDg1MTI4NjgwMTU4NDE4OQ.Gqx7Oe.iT20YungeUZmVEvnQxunve6seSkaLtN0utbz60');
+client.login('');
