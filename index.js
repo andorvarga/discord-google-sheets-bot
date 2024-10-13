@@ -74,4 +74,5 @@ client.on('messageCreate', async (message) => {
 });
 
 // Log into Discord
+console.log('Using token:', process.env.Discord);
 client.login(process.env.Discord);
