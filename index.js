@@ -23,7 +23,8 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message) => {
   console.log(`[DEBUG] Message received: ${message.content}`);
-
+  console.log('Content:', message.content);
+  console.log('Embeds:', message.embeds);
   // Ignore bot messages
   if (message.author.bot) return;
 
@@ -47,13 +48,4 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-// Log into Discord
-client.login(process.env.Discord);
-client.on('messageCreate', async (message) => {
-  console.log(`[DEBUG] Message received: ${message.content}`);
 
-  // Ignore messages from bots (including itself)
-  if (message.author.bot) return;
-
-  // Rest of your code...
-});
