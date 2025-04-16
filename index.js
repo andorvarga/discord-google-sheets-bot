@@ -22,31 +22,33 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
-  console.log(`[DEBUG] Message received: ${message.content}`);
-  console.log('Content:', message.content);
-  console.log('Embeds:', message.embeds);
-  // Ignore bot messages
-  if (message.author.bot) return;
+  // Only proceed if the message contains embeds
+  if (message.embeds.length > 0) {
+    const embed = message.embeds[0];
+    const description = embed.description || '';
 
-  const sheets = google.sheets({ version: 'v4', auth });
+    console.log("[DEBUG] Embed description:", description);
 
-  const values = [
-    [new Date().toISOString(), message.content]
-  ];
+    const values = [
+      new Date().toISOString(), // Timestamp
+      description               // Full embed description
+    ];
 
-  try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${SHEET_NAME}!A:B`,
-      valueInputOption: 'USER_ENTERED',
-      resource: { values },
-    });
-
-    console.log("[INFO] Message logged to Google Sheets");
-  } catch (err) {
-    console.error("[ERROR] Failed to log to Sheets:", err);
+    try {
+      const sheets = google.sheets({ version: 'v4', auth });
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `${SHEET_NAME}!A1:B1`,
+        valueInputOption: 'USER_ENTERED',
+        resource: {
+          values: [values],
+        },
+      });
+      console.log("[INFO] Logged to Google Sheets:", values);
+    } catch (err) {
+      console.error("[ERROR] Failed to write to Sheets:", err);
+    }
   }
 });
-
 client.login(process.env.Discord);
 
