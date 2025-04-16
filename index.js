@@ -49,4 +49,11 @@ client.on('messageCreate', async (message) => {
 
 // Log into Discord
 client.login(process.env.Discord);
-if (message.author.bot) return;
+client.on('messageCreate', async (message) => {
+  console.log(`[DEBUG] Message received: ${message.content}`);
+
+  // Ignore messages from bots (including itself)
+  if (message.author.bot) return;
+
+  // Rest of your code...
+});
