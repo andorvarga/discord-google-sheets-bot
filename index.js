@@ -48,4 +48,4 @@ client.on('messageCreate', async (message) => {
 });
 
 // Log into Discord
-client.login('${{Discord}}');
+client.login(process.env.Discord);
