@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // Load Google Sheets API credentials
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'discord-bot-integration-438503-4a280d21b268.json', // Path to your service account JSON
+  keyFile: 'google-svc.json', // Path to your service account JSON
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
