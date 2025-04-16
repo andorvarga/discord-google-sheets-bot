@@ -16,34 +16,34 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
+
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('messageCreate', async (message) => {
-  if (message.author.bot) return; // Skip messages from bots
+  console.log(`[DEBUG] Message received: ${message.content}`);
 
-  const timestamp = new Date().toISOString();
-  const content = message.content;
+  // Ignore bot messages
+  if (message.author.bot) return;
 
-  const values = [[timestamp, content]];
-  console.log("Logging to sheet:", values);
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const values = [
+    [new Date().toISOString(), message.content]
+  ];
 
   try {
-    const sheets = google.sheets({ version: 'v4', auth });
-
     await sheets.spreadsheets.values.append({
       spreadsheetId: SPREADSHEET_ID,
       range: `${SHEET_NAME}!A:B`,
       valueInputOption: 'USER_ENTERED',
-      resource: {
-        values,
-      },
+      resource: { values },
     });
 
-    console.log('Message logged successfully.');
+    console.log("[INFO] Message logged to Google Sheets");
   } catch (err) {
-    console.error('Error appending to Google Sheets:', err);
+    console.error("[ERROR] Failed to log to Sheets:", err);
   }
 });
 
