@@ -49,3 +49,4 @@ client.on('messageCreate', async (message) => {
 
 // Log into Discord
 client.login(process.env.Discord);
+if (message.author.bot) return;
