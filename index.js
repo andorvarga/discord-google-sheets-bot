@@ -35,29 +35,82 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   // Only proceed if the message contains embeds
   if (message.embeds.length > 0) {
-    const embed = message.embeds[0];
-    const description = embed.description || '';
+      const embed = message.embeds[0];
+      const description = embed.description || '';
+      const lines = description.split('\n');
 
-    console.log("[DEBUG] Embed description:", description);
+      let player = '';
+      let vehicle = '';
+      let mechanic = '';
+      let inTuningList = false;
+      const isTuningBill = embed.title && embed.title.includes('Tuning Bill');
 
-    const values = [
-      new Date().toISOString(), // Timestamp
-      description               // Full embed description
-    ];
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
 
+        // Extract Player and Vehicle
+        if (line.startsWith('Player')) {
+          const playerMatch = line.match(/Player\s+([^\[]+)/);
+          const vehicleMatch = line.match(/vehicle\s+(.+?\(.*?\))/i);
+          
+
+          if (playerMatch) player = playerMatch[1].replace(/\*/g, '').trim();;
+          if (vehicleMatch) vehicle = vehicleMatch[1].replace(/\*/g, '').trim();
+
+          if (!isTuningBill) {
+            mechanic = player; // In "Bought", mechanic is same as player
+          }
+        }
+
+        // Extract Mechanic if it's a Bill
+        if (isTuningBill) {
+          const mechMatch = line.match(/Mechanic\s+([^\[]+)/);
+          if (mechMatch) mechanic = mechMatch[1].replace(/\*/g, '').trim();
+        }
+
+        // Start of tuning list
+        if (line.includes('Tuning List:')) {
+          inTuningList = true;
+          continue;
+        }
+
+        // Exit tuning list section
+        if (inTuningList && (line.startsWith('Discount') || /^\d+:/.test(line))) {
+          break;
+        }
+
+        // Each tuning item
+        if (inTuningList && /\$\d+/.test(line)) {
+          const itemMatch = line.match(/^(.*?)\s*\$([\d,]+)/);
+          if (itemMatch) {
+            const service = itemMatch[1].replace(/\*/g, '').replace(/^[\s\-–—]+/, '').trim();
+            const price = itemMatch[2].replace(/,/g, '');
+
+            values.push([
+              new Date(message.timestamp).toISOString(),
+              player,
+              vehicle,
+              service,
+              price,
+              mechanic
+            ]);
+          }
+        }
+      }
+    }
+  }
+
+  if (values.length > 0) {
     try {
-      const sheets = google.sheets({ version: 'v4', auth });
       await sheets.spreadsheets.values.append({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${SHEET_NAME}!A1:B1`,
+        spreadsheetId,
+        range: `${sheetName}!A1:F1`,
         valueInputOption: 'USER_ENTERED',
-        resource: {
-          values: [values],
-        },
+        resource: { values },
       });
-      console.log("[INFO] Logged to Google Sheets:", values);
+      console.log('Messages logged to Google Sheets');
     } catch (err) {
-      console.error("[ERROR] Failed to write to Sheets:", err);
+      console.error('Error logging messages to Google Sheets:', err);
     }
   }
 });
