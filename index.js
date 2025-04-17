@@ -54,7 +54,7 @@ client.on('messageCreate', async (message) => {
           const vehicleMatch = line.match(/vehicle\s+(.+?\(.*?\))/i);
           
 
-          if (playerMatch) player = playerMatch[1].replace(/\*/g, '').trim();;
+          if (playerMatch) player = playerMatch[1].replace(/\*/g, '').trim();
           if (vehicleMatch) vehicle = vehicleMatch[1].replace(/\*/g, '').trim();
 
           if (!isTuningBill) {
@@ -98,7 +98,7 @@ client.on('messageCreate', async (message) => {
         }
       }
     }
-  }
+
 
   if (values.length > 0) {
     try {
