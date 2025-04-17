@@ -31,73 +31,68 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
-  // Only proceed if the message contains embeds
+  const values = [];
+
   if (message.embeds.length > 0) {
-      const embed = message.embeds[0];
-      const description = embed.description || '';
-      const lines = description.split('\n');
+    const embed = message.embeds[0];
+    const description = embed.description || '';
+    const lines = description.split('\n');
 
-      let player = '';
-      let vehicle = '';
-      let mechanic = '';
-      let inTuningList = false;
-      const isTuningBill = embed.title && embed.title.includes('Tuning Bill');
+    let player = '';
+    let vehicle = '';
+    let mechanic = '';
+    let inTuningList = false;
+    const isTuningBill = embed.title && embed.title.includes('Tuning Bill');
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
 
-        // Extract Player and Vehicle
-        if (line.startsWith('Player')) {
-          const playerMatch = line.match(/Player\s+([^\[]+)/);
-          const vehicleMatch = line.match(/vehicle\s+(.+?\(.*?\))/i);
-          
+      if (line.startsWith('Player')) {
+        const playerMatch = line.match(/Player\s+([^\[]+)/);
+        const vehicleMatch = line.match(/vehicle\s+(.+?\(.*?\))/i);
 
-          if (playerMatch) player = playerMatch[1].replace(/\*/g, '').trim();
-          if (vehicleMatch) vehicle = vehicleMatch[1].replace(/\*/g, '').trim();
+        if (playerMatch) player = playerMatch[1].replace(/\*/g, '').trim();
+        if (vehicleMatch) vehicle = vehicleMatch[1].replace(/\*/g, '').trim();
 
-          if (!isTuningBill) {
-            mechanic = player; // In "Bought", mechanic is same as player
-          }
+        if (!isTuningBill) {
+          mechanic = player;
         }
+      }
 
-        // Extract Mechanic if it's a Bill
-        if (isTuningBill) {
-          const mechMatch = line.match(/Mechanic\s+([^\[]+)/);
-          if (mechMatch) mechanic = mechMatch[1].replace(/\*/g, '').trim();
-        }
+      if (isTuningBill) {
+        const mechMatch = line.match(/Mechanic\s+([^\[]+)/);
+        if (mechMatch) mechanic = mechMatch[1].replace(/\*/g, '').trim();
+      }
 
-        // Start of tuning list
-        if (line.includes('Tuning List:')) {
-          inTuningList = true;
-          continue;
-        }
+      if (line.includes('Tuning List:')) {
+        inTuningList = true;
+        continue;
+      }
 
-        // Exit tuning list section
-        if (inTuningList && (line.startsWith('Discount') || /^\d+:/.test(line))) {
-          break;
-        }
+      if (inTuningList && (line.startsWith('Discount') || /^\d+:/.test(line))) {
+        break;
+      }
 
-        // Each tuning item
-        if (inTuningList && /\$\d+/.test(line)) {
-          const itemMatch = line.match(/^(.*?)\s*\$([\d,]+)/);
-          if (itemMatch) {
-            const service = itemMatch[1].replace(/\*/g, '').replace(/^[\s\-–—]+/, '').trim();
-            const price = itemMatch[2].replace(/,/g, '');
+      if (inTuningList && /\$\d+/.test(line)) {
+        const itemMatch = line.match(/^(.*?)\s*\$([\d,]+)/);
+        if (itemMatch) {
+          const service = itemMatch[1].replace(/\*/g, '').replace(/^[\s\-–—]+/, '').trim();
+          const price = itemMatch[2].replace(/,/g, '');
 
-            values.push([
-              new Date(message.timestamp).toISOString(),
-              player,
-              vehicle,
-              service,
-              price,
-              mechanic
-            ]);
-          }
+          values.push([
+            new Date(message.createdTimestamp).toISOString(),
+            player,
+            vehicle,
+            service,
+            price,
+            mechanic
+          ]);
         }
       }
     }
+  }
 
-
+  // Log to Google Sheets if there's something to log
   if (values.length > 0) {
     try {
       await sheets.spreadsheets.values.append({
@@ -106,9 +101,9 @@ client.on('messageCreate', async (message) => {
         valueInputOption: 'USER_ENTERED',
         resource: { values },
       });
-      console.log('Messages logged to Google Sheets');
+      console.log('Message logged from live listener.');
     } catch (err) {
-      console.error('Error logging messages to Google Sheets:', err);
+      console.error('Error logging to Google Sheets:', err);
     }
   }
 });
