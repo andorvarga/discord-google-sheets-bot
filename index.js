@@ -17,9 +17,9 @@ try {
   console.error('[ERROR] Failed to read or parse the service account JSON file:', err);
 }
 
-// Spreadsheet ID and sheet name
-const SPREADSHEET_ID = '1RkQTTAAizRMHTsn7hnClowbob5rYE0zM6riGguTK0Bs';
-const SHEET_NAME = 'Logs';
+const sheets = google.sheets({ version: 'v4', auth });
+const spreadsheetId = '1RkQTTAAizRMHTsn7hnClowbob5rYE0zM6riGguTK0Bs';
+const sheetName = 'Logs';
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
