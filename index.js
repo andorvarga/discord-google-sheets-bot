@@ -8,13 +8,11 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
-const path = 'discord-bot-integration-438503-4a280d21b268.json';
+const path = 'google-svc.json';
 
 try {
   const rawKeyFile = fs.readFileSync(path, 'utf8');
-  console.log('[DEBUG] Raw JSON Key File Content:', rawKeyFile.substring(0, 200), '...'); // first 200 chars only
   const parsed = JSON.parse(rawKeyFile);
-  console.log('[DEBUG] Parsed service account email:', parsed.client_email);
 } catch (err) {
   console.error('[ERROR] Failed to read or parse the service account JSON file:', err);
 }
