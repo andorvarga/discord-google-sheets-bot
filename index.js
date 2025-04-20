@@ -1,14 +1,12 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { google } = require('googleapis');
 
-const google = ''
-
-// Load Google Sheets API credentials from environment variable
 let credentials;
 try {
-  credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+  const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS, 'base64').toString('utf8');
+  credentials = JSON.parse(decoded);
 } catch (err) {
-  console.error('[ERROR] Failed to parse GOOGLE_KEYFILE from environment variables:', err);
+  console.error('[ERROR] Failed to decode GOOGLE_CREDENTIALS:', err);
   process.exit(1);
 }
 
