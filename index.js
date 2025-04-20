@@ -1,30 +1,32 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { google } = require('googleapis');
-const fs = require('fs');
 
-// Load Google Sheets API credentials
+const google = ''
+
+// Load Google Sheets API credentials from environment variable
+let credentials;
+try {
+  credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+} catch (err) {
+  console.error('[ERROR] Failed to parse GOOGLE_KEYFILE from environment variables:', err);
+  process.exit(1);
+}
+
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'google-svc.json', // Path to your service account JSON
+  credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
-
-const path = 'google-svc.json';
-
-try {
-  const rawKeyFile = fs.readFileSync(path, 'utf8');
-  const parsed = JSON.parse(rawKeyFile);
-} catch (err) {
-  console.error('[ERROR] Failed to read or parse the service account JSON file:', err);
-}
 
 const sheets = google.sheets({ version: 'v4', auth });
 const spreadsheetId = '1RkQTTAAizRMHTsn7hnClowbob5rYE0zM6riGguTK0Bs';
 const sheetName = 'Logs';
 
-const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
-});
+const discordToken = process.env.Discord; // Read from environment variable
+const channelId = '943188854003892275';
 
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+});
 
 client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -85,14 +87,13 @@ client.on('messageCreate', async (message) => {
             vehicle,
             service,
             price,
-            mechanic
+            mechanic,
           ]);
         }
       }
     }
   }
 
-  // Log to Google Sheets if there's something to log
   if (values.length > 0) {
     try {
       await sheets.spreadsheets.values.append({
@@ -107,5 +108,5 @@ client.on('messageCreate', async (message) => {
     }
   }
 });
-client.login(process.env.Discord);
 
+client.login(discordToken);
