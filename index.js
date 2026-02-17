@@ -19,7 +19,7 @@ const sheets = google.sheets({ version: 'v4', auth });
 const spreadsheetId = '1RkQTTAAizRMHTsn7hnClowbob5rYE0zM6riGguTK0Bs';
 const sheetName = 'Logs';
 
-const discordToken = process.env.Discord?.trim();
+const discordToken = process.env.Discord1?.trim();
 console.log('[DEBUG] Token length:', discordToken?.length, 'ends with:', JSON.stringify(discordToken?.slice(-5)));
 const channelId = '943188854003892275';
 
